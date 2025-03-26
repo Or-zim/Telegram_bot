@@ -1,16 +1,18 @@
 from aiogram import Router, types
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram import F
 import asyncio
+from handlers.filters import ChatFilter
 from database import add_user_coins, get_user_coin
 
 router = Router()
 
 last_click = {}
 CLICK_COOLDOWN = 1
+BOT_CHAT_ID = 5687454657 # id личного чата с ботом
 
-
-@router.message(Command("farmcoin"))
+@router.message(ChatFilter(chat_id=BOT_CHAT_ID), F.text.lower() == "фарм fkcoin")
 async def farm_coins(message: types.Message):
     user_id = message.from_user.id
 
@@ -31,7 +33,7 @@ async def click_button_callback(callback: types.CallbackQuery):
     await add_user_coins(user_id, 1)
     last_click[user_id] = now
     
-    await callback.answer("Сюда + 1FK")
+    await callback.answer("Сюда + 1 FK")
      
     builder = InlineKeyboardBuilder()
     builder.button(text='Фармим FKcoin', callback_data="click_button")

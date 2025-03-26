@@ -48,3 +48,9 @@ async def user_count(message: types.Message):
     us_count = await get_all_users_ad()
     await message.reply(f"Количество пользователей равно: {str(len(us_count))}")
 
+@router.message(Command("chatid"))
+async def chat_id_handler(message: types.Message):
+    """Отправляет ID чата."""
+    chat_id = message.chat.id
+    await message.answer(f"ID этого чата: {chat_id}")
+
