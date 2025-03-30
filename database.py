@@ -73,3 +73,20 @@ async def add_user_coins(user_id, amount):
     async with aiosqlite.connect(NAME_DB) as db:
         cursor = await db.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (amount, user_id))
         await db.commit()
+
+
+async def del_user_coins(user_id, amount):
+    """вычитает монеты из быланса пользователя"""
+    async with aiosqlite.connect(NAME_DB) as db:
+        cursor = await db.execute("UPDATE users SET balance = balance - ? WHERE user_id = ?", (amount, user_id))
+        await db.commit()
+
+
+async def get_username(user_id):
+    """выыодит тег пользователя"""
+    async with aiosqlite.connect(NAME_DB) as db:
+        cursor = await db.execute("SELECT username FROM users WHERE user_id = ?", (user_id, ))
+        result = await cursor.fetchone()
+        return result
+    
+    

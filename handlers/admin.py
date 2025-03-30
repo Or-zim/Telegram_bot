@@ -27,7 +27,6 @@ async def process_broad(message: types.Message, bot, state: FSMContext):
     """Обработчик текста рассылки"""
     text = message.text
     users_ids = await get_all_users_ad()
-    print(f"Список ID пользователей для рассылки: {users_ids}")
     success_count = 0
     fail_count = 0
     for user_id in users_ids:

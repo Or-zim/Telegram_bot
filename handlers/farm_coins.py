@@ -9,10 +9,10 @@ from database import add_user_coins, get_user_coin
 router = Router()
 
 last_click = {}
-CLICK_COOLDOWN = 1
+CLICK_COOLDOWN = 0.2
 BOT_CHAT_ID = 5687454657 # id личного чата с ботом
 
-@router.message(ChatFilter(chat_id=BOT_CHAT_ID), F.text.lower() == "фарм fkcoin")
+@router.message(F.text.lower() == "фарм fkcoin")
 async def farm_coins(message: types.Message):
     user_id = message.from_user.id
 
