@@ -2,6 +2,7 @@ import aiosqlite
 
 NAME_DB = 'bot_1.db'
 
+CHAT_ID = -4759195662
 async def create_tables():
     """создаем таблицу в базе данных"""
     async with aiosqlite.connect(NAME_DB) as db:
@@ -20,7 +21,7 @@ async def create_tables():
     async with aiosqlite.connect(NAME_DB) as db:
         await db.execute("""
         CREATE TABLE IF NOT EXISTS duels(
-            duel_id TEXT PRIMARY KEY, 
+            duel_id INTEGER PRIMARY KEY, 
             creator_duel_id INTEGER NOT NULL,
             creator_duel_name TEXT NOT NULL,
             creator_choice TEXT NOT NULL,
@@ -89,4 +90,10 @@ async def get_username(user_id):
         result = await cursor.fetchone()
         return result
     
-    
+async def add_duel(creator_duel_id=None, creator_duel_name=None, creator_choice=None, opponent_id=None, opponent_name=None, stake=None, chat_id=CHAT_ID, result=None, winner_id=None, status=False, ):
+    """добавляет дуэль в бд"""
+    async with aiosqlite.connect(NAME_DB) as db:
+        await db.execute("INSERT INTO duels(creator_duel_id, creator_duel_name, creator_choice, opponent_id, opponent_name, stake, chat_id, result, winner_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (creator_duel_id, creator_duel_name, creator_choice, opponent_id, opponent_name, stake, chat_id, result, winner_id, status))
+        await db.commit()
+        return True
+

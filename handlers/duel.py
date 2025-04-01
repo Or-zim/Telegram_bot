@@ -7,12 +7,15 @@ from aiogram.fsm.context import FSMContext
 from aiogram import F
 import asyncio
 import re
-from database import add_user_coins, del_user_coins, get_username
+from database import add_user_coins, del_user_coins, get_username, add_duel
 import random
 from aiogram.fsm.state import State, StatesGroup
-from database import get_user_coin, get_username
+from database import get_user_coin
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+import sys
+# print(sys.getdefaultencoding())
+    
 
 router = Router()
 
@@ -70,11 +73,17 @@ async def duel_func(message: types.Message):
         else:
             opponent_side = list_side[0]
         
-        callback_data = {'a1': a1, 'a2': a2, 'id': ui}# образуется словарь который передасться в play_callback размер которого не привышает 64 байта
-        callback_data_json = json.dumps(callback_data)
+        callback_data = {'a1': a1, 'a2': a2, 'id': ui}# образуется словарь который передасться в play_callback размер которого не привышает 64 байта. Размер данных без учета ставки максимум 39 байт, каждая цифра в ставке занимает 1 байт
+        callback_data_json = json.dumps(callback_data, separators=(',', ':'), ensure_ascii=False)  # сокращаем размер до минимума и определяем кодировкку для получения минималног размера
+        
+        # byte_length = len(callback_data_json.encode('utf-8')) 
+        # print(f"Длина callback_data_json в байтах (UTF-8): {byte_length}")
+        # print(f"Содержимое callback_data_json: {callback_data_json}")
+        
         builder = InlineKeyboardBuilder()
-        builder.button(text=f"Принять дуэль от игрока {username[0]}, за {opponent_side} на сумму {a2}", callback_data=callback_data_json)
-        await message.reply(f"Дуэль", reply_markup=builder.as_markup())
+        builder.button(text=f"Принять дуэль играя за {opponent_side.upper()}", callback_data=callback_data_json)
+        # await message.reply(f"""Дуэль от игрока: {username[0]}\nСтавка: {a2} FK\nСторона: {a1.upper()}""", reply_markup=builder.as_markup())
+        await message.reply(f"""Дуэль от игрока:-----{username[0]}\nСтавка:-----<b>{a2} FK</b>\nСторона:-----<b>{a1.upper()}</b>""", reply_markup=builder.as_markup(), parse_mode="HTML")
 
     except (ValueError, IndexError):
         await message.reply("Неверный формат команды. Используйте: /play [орел, решка] [сумма]")
@@ -92,15 +101,23 @@ async def play_callback(callback: types.CallbackQuery):
         username = await get_username(user_id) # тег того кто создал дуэль
         oppo_name = await get_username(opponent_id)# тег того кто принял дуэль
         balance_oppo = await get_user_coin(opponent_id)#баланс того кто принял дуэль 
-        
+        duel_args = [user_id, username[0], arg1, opponent_id, oppo_name[0], arg2]
+        print(duel_args)
         if balance_oppo[0] >= arg2:
             win_pos = coin_flip()
+        
             if win_pos == arg1.lower():
                 try:
                     await add_user_coins(user_id, arg2)
                     await del_user_coins(opponent_id, arg2)
                     await callback.answer(f"победа игрока {username[0]}", show_alert=True)
-                    await callback.message.edit_text(f"1Игрок {username[0]} выйграл. Результат {win_pos}")
+                    await callback.message.edit_text(f"Игрок {username[0]} выйграл. Результат {win_pos}")
+                    if user_id == opponent_id:
+                        await add_duel(user_id, username[0], arg1, stake=arg2)
+                        
+                    else:
+                        await add_duel(*duel_args, result=win_pos, winner_id=user_id, status=True)
+                        
                 except Exception as e:
                     print(f"Ошибка при обновлении баланса: {e}")
 
@@ -109,7 +126,13 @@ async def play_callback(callback: types.CallbackQuery):
                     await add_user_coins(opponent_id, arg2)
                     await del_user_coins(user_id, arg2)
                     await callback.answer(f"победа игрока {oppo_name[0]}", show_alert=True)
-                    await callback.message.edit_text(f"2Игрок {oppo_name[0]} выйграл. Результат {win_pos}")
+                    await callback.message.edit_text(f"Игрок {oppo_name[0]} выйграл. Результат {win_pos}")
+                    if user_id == opponent_id:
+                        await add_duel(user_id, username[0], arg1, stake=arg2)
+                       
+                    else:
+                        await add_duel(*duel_args, result=win_pos, winner_id=opponent_id, status=True)
+                        
                 except Exception as e:
                     print(f"Ошибка при обновлении баланса: {e}")
                     

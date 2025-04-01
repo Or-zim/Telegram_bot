@@ -3,8 +3,10 @@ from aiogram.filters import Command
 from database import add_users
 
 router = Router()
+CHAT_ID = -4759195662 #id chat group
 
-CHAT_ID = -4759195662 #id chat
+
+
 
 @router.message(Command('start'))
 async def start_hendler(message: types.Message):
@@ -16,24 +18,33 @@ async def start_hendler(message: types.Message):
     await add_users(user_id, username, first_name, last_name)
     
     if message.chat.id == CHAT_ID:
-        text_buttun = "Играть"
+            kb = [
+        [
+            types.KeyboardButton(text="Баланс")
+            
+        ]
+        ]
+            text_new_user = "Вас приветсвуте игровой бот Болванчик, это простой симулятор игры в 'Орел или Решка', здесь нету никакой подкрутки) и победа реально зависит от вашей удачи. Начать игру очень просто, для этого пропиши команду /play 'орел/решка' 'сумма ставки', и ожидай когда найдется тот, кто также желает испыть свою удачу! Чтобы отменить дуэль нужно сыграть самому с собой."
+
     else:
-        text_buttun = 'Фарм FKcoin'
-    
-    
-    kb = [
+            kb = [
         [
             types.KeyboardButton(text="Баланс"),
-            types.KeyboardButton(text=text_buttun)
-        ],
-    ]
+            types.KeyboardButton(text='Фарм FKcoin')
+        ]
+        ]
+            text_new_user = f"""
+            Вас приветсвуте игровой бот Болванчик, это простой симулятор игры в 'Орел или Решка', здесь нету никакой подкрутки) и победа реально зависит от вашей удачи. Чтобы заработать первые Freak coins нужно очень много кликать по кнопке в чате, если тебя это не устраиват, то ты можешь сыграть в общем чате и удвоить свой баланс! Вот ссылка на чат https://t.me/+XR4tWuBczghhY2Ey"""
+
+    
+
     
     keyboard = types.ReplyKeyboardMarkup(
         keyboard=kb,
         resize_keyboard=True,
         input_field_placeholder="Здавова вох"
     )
-    await message.answer('Вас приветствует болванчик!', reply_markup=keyboard)
+    await message.answer(text=text_new_user, reply_markup=keyboard)
 
 
 
