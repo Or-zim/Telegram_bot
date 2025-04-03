@@ -10,9 +10,13 @@ from database import create_tables
 from handlers import admin, users, farm_coins, balance, duel
 from handlers.filters import ChatFilter
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 async def main():
     logging.basicConfig(level=logging.INFO)
-    bot = Bot(token="7855524669:AAF5rFikKaFwfvhT0Q3_6fOm7WLiP1Y571Q")
+    bot = Bot(token=os.environ.get("BOT_TOKEN"))
     dp = Dispatcher()
     dp.include_router(users.router)
     dp.include_router(admin.router)

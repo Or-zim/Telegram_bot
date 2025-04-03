@@ -3,7 +3,10 @@ from aiogram.filters import Command
 from database import add_users
 
 router = Router()
-CHAT_ID = -4759195662 #id chat group
+import os
+from dotenv import load_dotenv
+load_dotenv()
+CHAT_ID = os.environ.get("GROUP_ID") #id chat group
 
 
 

@@ -5,12 +5,14 @@ from aiogram import F
 import asyncio
 from handlers.filters import ChatFilter
 from database import add_user_coins, get_user_coin
-
+import os
+from dotenv import load_dotenv
+load_dotenv()
 router = Router()
 
 last_click = {}
 CLICK_COOLDOWN = 0.2
-BOT_CHAT_ID = 5687454657 # id личного чата с ботом
+BOT_CHAT_ID = os.environ.get("BOT_CHAT_ID") # id личного чата с ботом
 
 @router.message(F.text.lower() == "фарм fkcoin")
 async def farm_coins(message: types.Message):
@@ -37,4 +39,4 @@ async def click_button_callback(callback: types.CallbackQuery):
      
     builder = InlineKeyboardBuilder()
     builder.button(text='Фармим FKcoin', callback_data="click_button")
-    await callback.message.edit_text(text="так дело не пойдет, свего + 1FK", reply_markup=builder.as_markup())
+    await callback.message.edit_text(text="так дело не пойдет, всего + 1FK", reply_markup=builder.as_markup())

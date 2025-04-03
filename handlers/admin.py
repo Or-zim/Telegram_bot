@@ -5,7 +5,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram import Router, F
 from time import sleep
-ADMIN_ID = 5687454657
+import os
+from dotenv import load_dotenv
+load_dotenv()
+ADMIN_ID = os.environ.get("ADMIN_ID")
 
 router = Router()
 

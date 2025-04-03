@@ -15,12 +15,14 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 import sys
 # print(sys.getdefaultencoding())
-    
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 router = Router()
 
-CHAT_ID = -4759195662
-
+CHAT_ID = os.environ.get("GROUP_ID")
+print(CHAT_ID)
 
 def coin_flip() -> str:
     """Случайным образом возвращает "орел" или "решка"."""
@@ -39,7 +41,7 @@ def create_side_keyboard():
     ]
     return ReplyKeyboardMarkup(keyboard=button, resize_keyboard=True, one_time_keyboard=True)
 
-@router.message(ChatFilter(chat_id=CHAT_ID), Command('play'))
+@router.message(ChatFilter(chat_id=int(CHAT_ID)), Command('play'))
 async def duel_func(message: types.Message):
     try:
         match = re.match(r'/play\s+(\w+)\s+(\d+)', message.text, re.IGNORECASE)
@@ -102,7 +104,6 @@ async def play_callback(callback: types.CallbackQuery):
         oppo_name = await get_username(opponent_id)# тег того кто принял дуэль
         balance_oppo = await get_user_coin(opponent_id)#баланс того кто принял дуэль 
         duel_args = [user_id, username[0], arg1, opponent_id, oppo_name[0], arg2]
-        print(duel_args)
         if balance_oppo[0] >= arg2:
             win_pos = coin_flip()
         
